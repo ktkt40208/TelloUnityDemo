@@ -22,6 +22,11 @@ public class OSC_Sender : MonoBehaviour
         message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentPos_X);
         message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentPos_Y);
         message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentPos_Z);
+        message.address = "/telloQuaternion";
+        message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentQuaternion_X);
+        message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentQuaternion_Y);
+        message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentQuaternion_Z);
+        message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentQuaternion_W);
         oscReference.Send(message);
 
         Debug.Log(TelloState.GetComponent<TelloController>().TelloCurrentPos_X);

@@ -16,9 +16,9 @@ public class OSC_Receiver : MonoBehaviour
 
     public float stick_controller2_a1x; //R Stick X
     public float stick_controller2_a1y; //R Stick Y
-    public float Y_controller2_b1_pressed; //R B or Y
+    public float B_controller2_b1_pressed; //R B or Y
     public float middleFin_controller2_b2_pressed; //R 中指
-    public float X_controller2_b3_pressed; //R A or X
+    public float A_controller2_b3_pressed; //R A or X
     public float thumbFin_controller2_b4_pressed; //R 親指
     public float indexFin_controller2_b5_pressed; //R 人差し指
 
@@ -106,7 +106,7 @@ public class OSC_Receiver : MonoBehaviour
 
     void OnReceive_2_Button_Y(OscMessage message)
     {
-        Y_controller2_b1_pressed = message.GetFloat(0);
+        B_controller2_b1_pressed = message.GetFloat(0);
     }
 
     void OnReceive_2_Middle(OscMessage message)
@@ -116,7 +116,7 @@ public class OSC_Receiver : MonoBehaviour
 
     void OnReceive_2_Button_X(OscMessage message)
     {
-        X_controller2_b3_pressed = message.GetFloat(0);
+        A_controller2_b3_pressed = message.GetFloat(0);
     }
 
     void OnReceive_2_Thumb(OscMessage message)

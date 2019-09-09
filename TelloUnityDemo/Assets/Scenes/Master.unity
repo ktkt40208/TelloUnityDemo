@@ -248,6 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   oscReference: {fileID: 1457213628}
+  TelloState: {fileID: 1799482721}
 --- !u!1 &864736760
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,6 +359,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 2463976d86d2904499410ad1b42acf27, type: 2}
+    - target: {fileID: 114243769742504354, guid: d97c49c3194f17a418d70b56d700d2a5,
+        type: 3}
+      propertyPath: OSC_Receiver
+      value: 
+      objectReference: {fileID: 1922271792}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d97c49c3194f17a418d70b56d700d2a5, type: 3}
 --- !u!1 &1159817099
@@ -673,6 +679,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1799482721 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1984629666776236, guid: d97c49c3194f17a418d70b56d700d2a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1048999315}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1846863877
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,3 +829,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   osc: {fileID: 1457213628}
+  stick_controller1_a1x: 0
+  stick_controller1_a1y: 0
+  Y_controller1_b1_pressed: 0
+  middleFin_controller1_b2_pressed: 0
+  X_controller1_b3_pressed: 0
+  thumbFin_controller1_b4_pressed: 0
+  indexFin_controller1_b5_pressed: 0
+  stick_controller2_a1x: 0
+  stick_controller2_a1y: 0
+  Y_controller2_b1_pressed: 0
+  middleFin_controller2_b2_pressed: 0
+  X_controller2_b3_pressed: 0
+  thumbFin_controller2_b4_pressed: 0
+  indexFin_controller2_b5_pressed: 0

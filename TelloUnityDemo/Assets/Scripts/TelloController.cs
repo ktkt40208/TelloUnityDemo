@@ -26,6 +26,10 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
     public float TelloCurrentQuaternion_Y;
     public float TelloCurrentQuaternion_Z;
     public float TelloCurrentQuaternion_W;
+    public float TelloPreviousQuaternion_X;
+    public float TelloPreviousQuaternion_Y;
+    public float TelloPreviousQuaternion_Z;
+    public float TelloPreviousQuaternion_W;
 
     // FlipType is used for the various flips supported by the Tello.
     public enum FlipType
@@ -138,75 +142,33 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 		float rx = 0f;
 		float ry = 0f;
 
-        //if (Input.GetKey(KeyCode.UpArrow)) {
-        //	ry = 1;
-        //}
-        //if (Input.GetKey(KeyCode.DownArrow)) {
-        //	ry = -1;
-        //}
-        //if (Input.GetKey(KeyCode.RightArrow))
-        //{
-        //    rx = 1;
-        //}              
-        //if (Input.GetKey(KeyCode.LeftArrow)) {
-        //	rx = -1;
-        //}
+        //Go Up!
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().B_controller2_b1_pressed > 0) { ly = 1;}
+        //Go Down!
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().A_controller2_b3_pressed > 0) { ly = -1;}
+        //Turn Right!
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x > 0.1f) { lx = 1;}
+        //Turn Left!
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x < -0.1f) { lx = -1;}
+        //Go Forward or Back!
         rx = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1x;
+        //Go Right or Left!
         ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
-        Debug.Log("rx =" + rx + ", ry =" + ry);
 
-        //ly = OSC_Receiver.GetComponent<OSC_Receiver>().indexFin_controller1_b5_pressed;
-        //lx = OSC_Receiver.GetComponent<OSC_Receiver>().middleFin_controller1_b2_pressed;
+        Debug.Log("lx =" + lx + ", ly =" + ly + "rx =" + rx + ", ry =" + ry);
 
-        //if (Input.GetKey(KeyCode.D))
-        //{
-            //	lx = 1;
-            //}
-            //if (Input.GetKey(KeyCode.A)) {
-            //	lx = -1;
-            //}
-
-            if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1y > 0)
-        {
-            ly = 1;
-        }
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1y < 0)
-        {
-            ly = -1;
-        }
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x > 0)
-        {
-            lx = 1;
-        }
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x < 0)
-        {
-            lx = -1;
-        }
-
-        //if (Input.GetKey(KeyCode.W))
-        //{
-        //    ly = 1;
-        //}
-        //if (Input.GetKey(KeyCode.S))
-        //{
-        //    ly = -1;
-        //}
-        //if (Input.GetKey(KeyCode.D))
-        //{
-        //    lx = 1;
-        //}
-        //if (Input.GetKey(KeyCode.A))
-        //{
-        //    lx = -1;
-        //}
-
-        Tello.controllerState.setAxis(lx, ly, rx, ry);
+        Tello.controllerState.setAxis(lx, ly, rx, ry); //float values
+        //Tello.controllerState.setSpeedMode(int mode);
 
         if (Tello.state.posX <= 0.05 && Tello.state.posY <= 0.05 && Tello.state.posZ <= 0.05)
         {
             TelloCurrentPos_X = TelloPreviousPos_X;
             TelloCurrentPos_Y = TelloPreviousPos_Y;
             TelloCurrentPos_Z = TelloPreviousPos_Z;
+            TelloCurrentQuaternion_X = TelloPreviousQuaternion_X;
+            TelloCurrentQuaternion_Y = TelloPreviousQuaternion_Y;
+            TelloCurrentQuaternion_Z = TelloPreviousQuaternion_Z;
+            TelloCurrentQuaternion_W = TelloPreviousQuaternion_W;
         }
         else
         {
@@ -223,11 +185,15 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         TelloPreviousPos_X = TelloCurrentPos_X;
         TelloPreviousPos_Y = TelloCurrentPos_Y;
         TelloPreviousPos_Z = TelloCurrentPos_Z;
+        TelloPreviousQuaternion_X = TelloCurrentQuaternion_X;
+        TelloPreviousQuaternion_Y = TelloCurrentQuaternion_Y;
+        TelloPreviousQuaternion_Z = TelloCurrentQuaternion_Z;
+        TelloPreviousQuaternion_W = TelloCurrentQuaternion_W;
     }
 
 
 
-	private void Tello_onUpdate(int cmdId)
+    private void Tello_onUpdate(int cmdId)
 	{
         //throw new System.NotImplementedException();
         //Debug.Log("Tello_onUpdate : " + Tello.state);
