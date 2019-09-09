@@ -13,8 +13,22 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
 	private TelloVideoTexture telloVideoTexture;
 
-	// FlipType is used for the various flips supported by the Tello.
-	public enum FlipType
+
+    public GameObject OSC_Receiver;
+
+    public float TelloCurrentPos_X;
+    public float TelloCurrentPos_Y;
+    public float TelloCurrentPos_Z;
+    public float TelloPreviousPos_X;
+    public float TelloPreviousPos_Y;
+    public float TelloPreviousPos_Z;
+    public float TelloCurrentQuaternion_X;
+    public float TelloCurrentQuaternion_Y;
+    public float TelloCurrentQuaternion_Z;
+    public float TelloCurrentQuaternion_W;
+
+    // FlipType is used for the various flips supported by the Tello.
+    public enum FlipType
 	{
 
 		// FlipFront flips forward.
@@ -104,52 +118,124 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 	// Update is called once per frame
 	void Update () {
 
-		if (Input.GetKeyDown(KeyCode.T)) {
-			Tello.takeOff();
-		} else if (Input.GetKeyDown(KeyCode.L)) {
-			Tello.land();
-		}
+        //if (Input.GetKeyDown(KeyCode.T)) {
+        //	Tello.takeOff();
+        //} else if (Input.GetKeyDown(KeyCode.L)) {
+        //	Tello.land();
+        //}
+        if (Input.GetKey(KeyCode.T) || (OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed > 0))
+        {
+            Tello.takeOff();
+        }
+        else if ((Input.GetKeyDown(KeyCode.L)) ||(OSC_Receiver.GetComponent<OSC_Receiver>().X_controller1_b3_pressed > 0))
+        {
+            Tello.land();
+        }
+        Debug.Log(OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed);
 
-		float lx = 0f;
+        float lx = 0f;
 		float ly = 0f;
 		float rx = 0f;
 		float ry = 0f;
 
-		if (Input.GetKey(KeyCode.UpArrow)) {
-			ry = 1;
-		}
-		if (Input.GetKey(KeyCode.DownArrow)) {
-			ry = -1;
-		}
-		if (Input.GetKey(KeyCode.RightArrow)) {
-			rx = 1;
-		}
-		if (Input.GetKey(KeyCode.LeftArrow)) {
-			rx = -1;
-		}
-		if (Input.GetKey(KeyCode.W)) {
-			ly = 1;
-		}
-		if (Input.GetKey(KeyCode.S)) {
-			ly = -1;
-		}
-		if (Input.GetKey(KeyCode.D)) {
-			lx = 1;
-		}
-		if (Input.GetKey(KeyCode.A)) {
-			lx = -1;
-		}
-		Tello.controllerState.setAxis(lx, ly, rx, ry);
+        //if (Input.GetKey(KeyCode.UpArrow)) {
+        //	ry = 1;
+        //}
+        //if (Input.GetKey(KeyCode.DownArrow)) {
+        //	ry = -1;
+        //}
+        //if (Input.GetKey(KeyCode.RightArrow))
+        //{
+        //    rx = 1;
+        //}              
+        //if (Input.GetKey(KeyCode.LeftArrow)) {
+        //	rx = -1;
+        //}
+        rx = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1x;
+        ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
+        Debug.Log("rx =" + rx + ", ry =" + ry);
 
-	}
+        //ly = OSC_Receiver.GetComponent<OSC_Receiver>().indexFin_controller1_b5_pressed;
+        //lx = OSC_Receiver.GetComponent<OSC_Receiver>().middleFin_controller1_b2_pressed;
+
+        //if (Input.GetKey(KeyCode.D))
+        //{
+            //	lx = 1;
+            //}
+            //if (Input.GetKey(KeyCode.A)) {
+            //	lx = -1;
+            //}
+
+            if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1y > 0)
+        {
+            ly = 1;
+        }
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1y < 0)
+        {
+            ly = -1;
+        }
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x > 0)
+        {
+            lx = 1;
+        }
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x < 0)
+        {
+            lx = -1;
+        }
+
+        //if (Input.GetKey(KeyCode.W))
+        //{
+        //    ly = 1;
+        //}
+        //if (Input.GetKey(KeyCode.S))
+        //{
+        //    ly = -1;
+        //}
+        //if (Input.GetKey(KeyCode.D))
+        //{
+        //    lx = 1;
+        //}
+        //if (Input.GetKey(KeyCode.A))
+        //{
+        //    lx = -1;
+        //}
+
+        Tello.controllerState.setAxis(lx, ly, rx, ry);
+
+        if (Tello.state.posX <= 0.05 && Tello.state.posY <= 0.05 && Tello.state.posZ <= 0.05)
+        {
+            TelloCurrentPos_X = TelloPreviousPos_X;
+            TelloCurrentPos_Y = TelloPreviousPos_Y;
+            TelloCurrentPos_Z = TelloPreviousPos_Z;
+        }
+        else
+        {
+            TelloCurrentPos_X = Tello.state.posX;
+            TelloCurrentPos_Y = Tello.state.posY;
+            TelloCurrentPos_Z = Tello.state.posZ;
+            TelloCurrentQuaternion_X = Tello.state.quatX;
+            TelloCurrentQuaternion_Y = Tello.state.quatY;
+            TelloCurrentQuaternion_Z = Tello.state.quatZ;
+            TelloCurrentQuaternion_W = Tello.state.quatW;
+        }
+
+        //Debug.Log("Tello_onUpdate : " + "x = " + TelloCurrentPos_X.ToString("f2") + ", y = " + TelloCurrentPos_Y.ToString("f2") + ", z = " + TelloCurrentPos_Z.ToString("f2"));
+        TelloPreviousPos_X = TelloCurrentPos_X;
+        TelloPreviousPos_Y = TelloCurrentPos_Y;
+        TelloPreviousPos_Z = TelloCurrentPos_Z;
+    }
+
+
 
 	private void Tello_onUpdate(int cmdId)
 	{
-		//throw new System.NotImplementedException();
-		Debug.Log("Tello_onUpdate : " + Tello.state);
-	}
+        //throw new System.NotImplementedException();
+        //Debug.Log("Tello_onUpdate : " + Tello.state);
 
-	private void Tello_onConnection(Tello.ConnectionState newState)
+
+    }
+
+    private void Tello_onConnection(Tello.ConnectionState newState)
 	{
 		//throw new System.NotImplementedException();
 		//Debug.Log("Tello_onConnection : " + newState);
