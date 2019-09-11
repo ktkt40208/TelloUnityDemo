@@ -155,7 +155,7 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         //Go Right or Left!
         ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
 
-        Debug.Log("lx =" + lx + ", ly =" + ly + "rx =" + rx + ", ry =" + ry);
+        Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
 
         Tello.controllerState.setAxis(lx, ly, rx, ry); //float values
         //Tello.controllerState.setSpeedMode(int mode);

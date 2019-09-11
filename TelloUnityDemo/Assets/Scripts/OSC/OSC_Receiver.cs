@@ -22,11 +22,19 @@ public class OSC_Receiver : MonoBehaviour
     public float thumbFin_controller2_b4_pressed; //R 親指
     public float indexFin_controller2_b5_pressed; //R 人差し指
 
+    public float HMD_head_tx; //
+    public float HMD_head_ty; //
+    public float HMD_head_tz; //
+    public float HMD_head_qx; //
+    public float HMD_head_qy; //
+    public float HMD_head_qz; //
+    public float HMD_head_qw; //
+
 
     // Use this for initialization
     void Start()
     {
-        osc.SetAddressHandler("/CubeXYZ", OnReceiveXYZ);
+        //osc.SetAddressHandler("/CubeXYZ", OnReceiveXYZ);
         osc.SetAddressHandler("/controller1:a1x", OnReceive_1_Stick_X);
         osc.SetAddressHandler("/controller1:a1y", OnReceive_1_Stick_Y);
         osc.SetAddressHandler("/controller1:b1:pressed", OnReceive_1_Button_Y);
@@ -34,6 +42,7 @@ public class OSC_Receiver : MonoBehaviour
         osc.SetAddressHandler("/controller1:b3:pressed", OnReceive_1_Button_X);
         osc.SetAddressHandler("/controller1:b4:pressed", OnReceive_1_Thumb);
         osc.SetAddressHandler("/controller1:b5:pressed", OnReceive_1_Index);
+
         osc.SetAddressHandler("/controller2:a1x", OnReceive_2_Stick_X);
         osc.SetAddressHandler("/controller2:a1y", OnReceive_2_Stick_Y);
         osc.SetAddressHandler("/controller2:b1:pressed", OnReceive_2_Button_Y);
@@ -41,6 +50,14 @@ public class OSC_Receiver : MonoBehaviour
         osc.SetAddressHandler("/controller2:b3:pressed", OnReceive_2_Button_X);
         osc.SetAddressHandler("/controller2:b4:pressed", OnReceive_2_Thumb);
         osc.SetAddressHandler("/controller2:b5:pressed", OnReceive_2_Index);
+
+        osc.SetAddressHandler("/head:tx", OnReceive_HMD_head_tx);
+        osc.SetAddressHandler("/head:ty", OnReceive_HMD_head_ty);
+        osc.SetAddressHandler("/head:tz", OnReceive_HMD_head_tz);
+        osc.SetAddressHandler("/head:qx", OnReceive_HMD_head_qx);
+        osc.SetAddressHandler("/head:qy", OnReceive_HMD_head_qy);
+        osc.SetAddressHandler("/head:qz", OnReceive_HMD_head_qz);
+        osc.SetAddressHandler("/head:qw", OnReceive_HMD_head_qw);
     }
 
     // Update is called once per frame
@@ -49,14 +66,14 @@ public class OSC_Receiver : MonoBehaviour
 
     }
 
-    void OnReceiveXYZ(OscMessage message)
-    {
-        float x = message.GetFloat(0);
-        float y = message.GetFloat(1);
-        float z = message.GetFloat(2);
+    //void OnReceiveXYZ(OscMessage message)
+    //{
+    //    float x = message.GetFloat(0);
+    //    float y = message.GetFloat(1);
+    //    float z = message.GetFloat(2);
 
-        transform.position = new Vector3(x, y, z);
-    }
+    //    transform.position = new Vector3(x, y, z);
+    //}
 
     void OnReceive_1_Stick_X(OscMessage message)
     {
@@ -127,6 +144,35 @@ public class OSC_Receiver : MonoBehaviour
     void OnReceive_2_Index(OscMessage message)
     {
         indexFin_controller2_b5_pressed = message.GetFloat(0);
+    }
+
+    void OnReceive_HMD_head_tx(OscMessage message)
+    {
+        HMD_head_tx = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_ty(OscMessage message)
+    {
+        HMD_head_ty = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_tz(OscMessage message)
+    {
+        HMD_head_tz = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_qx(OscMessage message)
+    {
+        HMD_head_qx = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_qy(OscMessage message)
+    {
+        HMD_head_qy = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_qz(OscMessage message)
+    {
+        HMD_head_qz = message.GetFloat(0);
+    }
+    void OnReceive_HMD_head_qw(OscMessage message)
+    {
+        HMD_head_qw = message.GetFloat(0);
     }
 
 }
