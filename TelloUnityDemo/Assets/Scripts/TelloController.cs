@@ -135,7 +135,7 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         {
             Tello.land();
         }
-        Debug.Log(OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed);
+        //Debug.Log(OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed);
 
         float lx = 0f;
 		float ly = 0f;
@@ -143,17 +143,38 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 		float ry = 0f;
 
         //Go Up!
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().B_controller2_b1_pressed > 0) { ly = 1;}
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().B_controller2_b1_pressed > 0 || Input.GetKey(KeyCode.W)) { ly = 1;}
         //Go Down!
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().A_controller2_b3_pressed > 0) { ly = -1;}
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().A_controller2_b3_pressed > 0 || Input.GetKey(KeyCode.S)) { ly = -1;}
         //Turn Right!
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x > 0.1f) { lx = 1;}
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x > 0.1f || Input.GetKey(KeyCode.D)) { lx = 1;}
         //Turn Left!
-        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x < -0.1f) { lx = -1;}
+        if (OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller2_a1x < -0.1f || Input.GetKey(KeyCode.A)) { lx = -1;}
         //Go Forward or Back!
-        rx = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1x;
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            rx = 1;
+        } else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            rx = -1;
+        }
+        else {
+            rx = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1x;
+        }
+
         //Go Right or Left!
-        ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            ry = 1;
+        }else if (Input.GetKey(KeyCode.DownArrow))
+        {
+            ry = -1;
+        }
+        else
+        {
+            ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
+        }
+        
 
         Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
 
@@ -162,6 +183,7 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
         if (Tello.state.posX <= 0.05 && Tello.state.posY <= 0.05 && Tello.state.posZ <= 0.05)
         {
+            Debug.Log("Can't get the transform data, so use previous flame: TelloPreviousPos_X = " + TelloPreviousPos_X + ", TelloCurrentPos_X = " + TelloCurrentPos_X);
             TelloCurrentPos_X = TelloPreviousPos_X;
             TelloCurrentPos_Y = TelloPreviousPos_Y;
             TelloCurrentPos_Z = TelloPreviousPos_Z;
@@ -169,6 +191,7 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
             TelloCurrentQuaternion_Y = TelloPreviousQuaternion_Y;
             TelloCurrentQuaternion_Z = TelloPreviousQuaternion_Z;
             TelloCurrentQuaternion_W = TelloPreviousQuaternion_W;
+
         }
         else
         {
