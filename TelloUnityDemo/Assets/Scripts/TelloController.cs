@@ -22,6 +22,12 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
     public float TelloPreviousPos_X;
     public float TelloPreviousPos_Y;
     public float TelloPreviousPos_Z;
+    public float TelloInitialPos_X;
+    public float TelloInitialPos_Y;
+    public float TelloInitialPos_Z;
+
+    public float TelloFloatingInitialPos_Z;
+
     public float TelloCurrentQuaternion_X;
     public float TelloCurrentQuaternion_Y;
     public float TelloCurrentQuaternion_Z;
@@ -30,6 +36,19 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
     public float TelloPreviousQuaternion_Y;
     public float TelloPreviousQuaternion_Z;
     public float TelloPreviousQuaternion_W;
+
+    public GameObject HMD_Yup;
+    public GameObject Drone_Yup_Virtual;
+    public GameObject Drone_Yup_Real;
+
+    private float realDestinationZ;
+    private Quaternion realRotationDifferenceY;
+    private float realForwardDistanceZ;
+    public float idealForwardDistance = 1.0f;
+    Vector3 ForwardTargetPos;
+    Vector3 m_verocity;
+    public bool isFlying = false;
+    public bool isLanding = false;
 
     // FlipType is used for the various flips supported by the Tello.
     public enum FlipType
@@ -119,21 +138,63 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 		Tello.stopConnecting();
 	}
 
-	// Update is called once per frame
-	void Update () {
 
-        //if (Input.GetKeyDown(KeyCode.T)) {
-        //	Tello.takeOff();
-        //} else if (Input.GetKeyDown(KeyCode.L)) {
-        //	Tello.land();
-        //}
+
+    void setFlyingTrue() {
+        isFlying = true;
+    }
+
+    void setFinishLandingTrue()
+    {
+        Debug.Log("setFinishLandingTrue: Tello.state.posX = " + Tello.state.posX + ", Tello.state.posY = " + Tello.state.posY + ", Tello.state.posZ = " + Tello.state.posZ);
+        TelloFloatingInitialPos_Z = Tello.state.posZ;
+        isLanding = false;
+    }
+
+    void RelativeVectorZ()
+    {
+        realDestinationZ = HMD_Yup.transform.position.y - Drone_Yup_Real.transform.position.y;
+        //Debug.Log("Tello.state.posZ = " + Tello.state.posZ + ", HMD_Yup.transform.position.y = " + HMD_Yup.transform.position.y + ", Drone_Yup.transform.position. = " + Drone_Yup.transform.position.y);
+        //Debug.Log("realDestinationZ = " + realDestinationZ);
+    }
+
+    void RelativeRotationY()
+    {
+        Drone_Yup_Virtual.transform.LookAt(HMD_Yup.transform);
+        //Debug.Log("Drone_Yup_Virtual.transform.rotation = " + Drone_Yup_Virtual.transform.rotation);
+        //Debug.Log("Drone_Yup_Real.transform.rotation = " + Drone_Yup_Real.transform.rotation);
+        realRotationDifferenceY = Drone_Yup_Virtual.transform.rotation * Quaternion.Inverse(Drone_Yup_Real.transform.rotation);
+        Debug.Log("realRotationDifferenceY = " + realRotationDifferenceY);
+    }
+
+    void RelativeForwardDistanceZ() {
+        realForwardDistanceZ = Mathf.Pow((Mathf.Pow((HMD_Yup.transform.position.x - Drone_Yup_Virtual.transform.position.x), 2.0f) + Mathf.Pow((HMD_Yup.transform.position.z - Drone_Yup_Virtual.transform.position.z), 2.0f)), 0.5f) - idealForwardDistance;
+        //ForwardTargetPos = new Vector3(Drone_Yup_Virtual.transform.position.x, Drone_Yup_Virtual.transform.position.y, Drone_Yup_Virtual.transform.position.z);
+        //m_verocity += (ForwardTargetPos - Drone_Yup_Virtual.transform.position) * 5.0f;
+        //m_verocity *= 0.5f;
+        //Drone_Yup_Virtual.transform.position += m_verocity *= Time.deltaTime;
+        Drone_Yup_Virtual.transform.position += realForwardDistanceZ * (Drone_Yup_Virtual.transform.forward) * Time.deltaTime;
+    }
+    // Update is called once per frame
+    void Update () {
+
+
         if (Input.GetKey(KeyCode.T) || (OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed > 0))
         {
             Tello.takeOff();
+            isLanding = true;
+            Invoke("setFlyingTrue", 0.2f);
+            TelloInitialPos_X = Tello.state.posX;
+            TelloInitialPos_Y = Tello.state.posY;
+            TelloInitialPos_Z = Tello.state.posZ;
+            Invoke("setFinishLandingTrue", 4.5f);
+
         }
         else if ((Input.GetKeyDown(KeyCode.L)) ||(OSC_Receiver.GetComponent<OSC_Receiver>().X_controller1_b3_pressed > 0))
         {
             Tello.land();
+            
+            isFlying = false;
         }
         //Debug.Log(OSC_Receiver.GetComponent<OSC_Receiver>().Y_controller1_b1_pressed);
 
@@ -141,6 +202,56 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 		float ly = 0f;
 		float rx = 0f;
 		float ry = 0f;
+
+        RelativeVectorZ();
+        
+        if ((realDestinationZ > 0.15f) && isFlying && !isLanding)
+        {
+            ly = 0.3f;
+        }
+        else if ((realDestinationZ < -0.15f) && isFlying && !isLanding)
+        {
+            ly = -0.3f;
+        }
+        else if ((realDestinationZ > 0.075f) && isFlying && !isLanding)
+        {
+            ly = -0.1f;
+        }
+        else if ((realDestinationZ < -0.075f) && isFlying && !isLanding)
+        {
+            ly = -0.1f;
+        }
+        else
+        {
+            ly = 0f;
+        }
+
+
+        RelativeRotationY();
+
+        if (((realRotationDifferenceY.y > 0.15f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y < -0.15f) && (realRotationDifferenceY.w < 0) && isFlying && !isLanding))
+        {
+            lx = 0.6f;
+        }
+        else if (((realRotationDifferenceY.y < -0.15f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y > 0.15f) && (realRotationDifferenceY.w < 0) && isFlying && !isLanding))
+        {
+            lx = -0.6f;
+        }
+        else if (((realRotationDifferenceY.y > 0.075f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y < -0.075f) && (realRotationDifferenceY.w < 0) && isFlying && !isLanding))
+        {
+            lx = -0.1f;
+        }
+        else if (((realRotationDifferenceY.y < -0.075f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y > 0.075f && (realRotationDifferenceY.w < 0) && isFlying && !isLanding)))
+        {
+            lx = -0.1f;
+        }
+        else
+        {
+            lx = 0f;
+        }
+
+        //RelativeForwardDistanceZ();
+
 
         //Go Up!
         if (OSC_Receiver.GetComponent<OSC_Receiver>().B_controller2_b1_pressed > 0 || Input.GetKey(KeyCode.W)) { ly = 1;}
@@ -174,14 +285,15 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         {
             ry = OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
         }
-        
 
-        Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
+
+        //Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
+        //Debug.Log("Tello.state.posX = " + Tello.state.posX + ", Tello.state.posY = " + Tello.state.posY + ", Tello.state.posZ = " + Tello.state.posZ);
 
         Tello.controllerState.setAxis(lx, ly, rx, ry); //float values
         //Tello.controllerState.setSpeedMode(int mode);
 
-        if (Tello.state.posX <= 0.05 && Tello.state.posY <= 0.05 && Tello.state.posZ <= 0.05)
+        if (Math.Abs(Tello.state.posX) <= 0.01 && Math.Abs(Tello.state.posY) <= 0.01 && Math.Abs(Tello.state.posZ) <= 0.01)
         {
             Debug.Log("Can't get the transform data, so use previous flame: TelloPreviousPos_X = " + TelloPreviousPos_X + ", TelloCurrentPos_X = " + TelloCurrentPos_X);
             TelloCurrentPos_X = TelloPreviousPos_X;
