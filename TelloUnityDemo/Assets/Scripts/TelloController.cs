@@ -163,9 +163,10 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
     void RelativeVectorZ()
     {
+        //realDestinationZ = HMD_Yup.transform.position.y - Drone_Yup_Real.transform.position.y;
         realDestinationZ = HMD_Yup.transform.position.y - Drone_Yup_Real.transform.position.y;
-        //Debug.Log("Tello.state.posZ = " + Tello.state.posZ + ", HMD_Yup.transform.position.y = " + HMD_Yup.transform.position.y + ", Drone_Yup.transform.position. = " + Drone_Yup.transform.position.y);
-        //Debug.Log("realDestinationZ = " + realDestinationZ);
+        Debug.Log("Tello.state.posZ = " + Tello.state.posZ + ", HMD_Yup.transform.position.y = " + HMD_Yup.transform.position.y + ", Drone_Yup.transform.position. = " + Drone_Yup_Real.transform.position.y);
+        Debug.Log("realDestinationZ = " + realDestinationZ);
     }
 
     void RelativeRotationY()
@@ -223,18 +224,23 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         if ((realDestinationZ > 0.15f) && isFlying && !isLanding)
         {
             ly = 0.3f;
+            Debug.Log("上昇");
         }
         else if ((realDestinationZ < -0.15f) && isFlying && !isLanding)
         {
             ly = -0.3f;
+            Debug.Log("降下");
+
         }
         else if ((realDestinationZ > 0.075f) && isFlying && !isLanding)
         {
             ly = 0.1f;
+            Debug.Log("ちょっと上昇");
         }
         else if ((realDestinationZ < -0.075f) && isFlying && !isLanding)
         {
             ly = -0.1f;
+            Debug.Log("ちょっと降下");
         }
         else
         {
@@ -242,20 +248,22 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
         }
 
         //バーチャルドローンは高さYのみリアルに依存させます。XZはリアルドローンを逆に依存（追従）させます。
-        Drone_Yup_Virtual.transform.position = new Vector3(Drone_Yup_Virtual.transform.position.x, Drone_Yup_Real.transform.position.y, Drone_Yup_Virtual.transform.position.z);
+        //Drone_Yup_Virtual.transform.position = new Vector3(Drone_Yup_Virtual.transform.position.x, Drone_Yup_Real.transform.position.y, Drone_Yup_Virtual.transform.position.z);
 
         
         RelativeRotationY();
         ////ドローンの正面を対象のゲームオブジェクトに向けます。
         if (((realRotationDifferenceY.y > 0.15f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y < -0.15f) && (realRotationDifferenceY.w < 0) && isFlying && !isLanding))
         {
-            lx = 0.6f;
+            lx = 0.8f;
+            //lx = 0.6f;
             isForwardDirectionMatched = false;
             Debug.Log("時計回りに回転");
         }
         else if (((realRotationDifferenceY.y < -0.15f) && (realRotationDifferenceY.w >= 0) && isFlying && !isLanding) || ((realRotationDifferenceY.y > 0.15f) && (realRotationDifferenceY.w < 0) && isFlying && !isLanding))
         {
-            lx = -0.6f;
+            lx = -0.8f;
+            //lx = -0.6f;
             isForwardDirectionMatched = false;
             Debug.Log("反対の時計回りに回転");
         }
@@ -276,21 +284,26 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
             lx = 0f;
         }
 
-        if (isFlying && !isLanding)
-        {
-            RelativeForwardDistanceZ();
-        }
+        //デバッグ用
+        RelativeForwardDistanceZ();
+        //本番
+        //if (isFlying && !isLanding)
+        //{
+        //    RelativeForwardDistanceZ();
+        //}
 
 
         //ドローンと対象のゲームオブジェクト距離を一定以下に保ちます。
         if ((distanceOfRealAndVirtual > 0.5f) && ((realForwardDistanceZbyVirtuallDrone - realForwardDistanceZbyRealDrone) < 0.1f) && isFlying && !isLanding)
         {
-            ry = 0.2f;
+            ry = 0.5f;
+            //ry = 0.2f;
             Debug.Log("前に進む");
         }
         else if ((distanceOfRealAndVirtual > 0.5f) && ((realForwardDistanceZbyVirtuallDrone - realForwardDistanceZbyRealDrone) > -0.1f) && isFlying && !isLanding)
         {
-            ry = -0.2f;
+            ry = -0.5f;
+            //ry = -0.2f;
             Debug.Log("後ろに下がる");
         }
         else if ((distanceOfRealAndVirtual > 0.2f) && ((realForwardDistanceZbyVirtuallDrone - realForwardDistanceZbyRealDrone) < 0.1f) && isFlying && !isLanding)
@@ -341,9 +354,9 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
             ry += OSC_Receiver.GetComponent<OSC_Receiver>().stick_controller1_a1y;
         }
 
-        Debug.Log("ry = " + ry);
+        //Debug.Log("ry = " + ry);
 
-        //Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
+        Debug.Log("lx = " + lx + ", ly = " + ly + ", rx = " + rx + ", ry = " + ry);
         //Debug.Log("Tello.state.posX = " + Tello.state.posX + ", Tello.state.posY = " + Tello.state.posY + ", Tello.state.posZ = " + Tello.state.posZ);
 
         Tello.controllerState.setAxis(lx, ly, rx, ry); //float values
@@ -351,7 +364,7 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
 
         //センサーからのデータの外れ値をスキップします。
-        if (Math.Abs(Tello.state.posX) <= 0.01 && Math.Abs(Tello.state.posY) <= 0.01 && Math.Abs(Tello.state.posZ) <= 0.01)
+        if (Math.Abs(Tello.state.posX) <= 0.05 && Math.Abs(Tello.state.posY) <= 0.05 && Math.Abs(Tello.state.posZ) <= 0.05)
         {
             Debug.Log("Can't get the transform data, so use previous flame: TelloPreviousPos_X = " + TelloPreviousPos_X + ", TelloCurrentPos_X = " + TelloCurrentPos_X);
             TelloCurrentPos_X = TelloPreviousPos_X;
