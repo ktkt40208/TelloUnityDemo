@@ -29,7 +29,7 @@ public class OSC_Sender : MonoBehaviour
         //message.values.Add(TelloState.GetComponent<TelloController>().TelloCurrentQuaternion_W);
         oscReference.Send(message);
 
-        Debug.Log(TelloState.GetComponent<TelloController>().TelloCurrentPos_X);
+        //Debug.Log(TelloState.GetComponent<TelloController>().TelloCurrentPos_X);
     }
 
     void OnMouseDown()

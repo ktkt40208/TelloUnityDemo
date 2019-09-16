@@ -38,7 +38,7 @@ public class Drone_Transform : MonoBehaviour
             initialPx = TelloController.GetComponent<TelloController>().TelloCurrentPos_X;
             initialPy = TelloController.GetComponent<TelloController>().TelloCurrentPos_Y;
             initialPz = TelloController.GetComponent<TelloController>().TelloCurrentPos_Z; // Zの値は、センサーからの数値のずれが激しいためこれまでのは用いない。毎回床面から安定した高さにホバリングするのでその高さを名指しで指定する。
-            Debug.Log("initialPx = " + initialPx + ", initialPy = " + initialPy + ", initialPz = " + initialPz);
+            Debug.Log("□□□□□ initialPx = " + initialPx + ", initialPy = " + initialPy + ", initialPz = " + initialPz);
             initinalState = false;
                 
         }else if (!TelloController.GetComponent<TelloController>().isFlying)
